@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fffaf0">
+<meta name="theme-color" content="#003C78">
 <title>Estojo de Talentos</title>
 <meta name="description" content="Autoavaliação gamificada das professoras e professores do Integral, com resultado e horário do feedback.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,19 +15,21 @@
   --paper:#fffaf0; --ink:#2b2a33; --muted:#6b6874; --line:#e3ecf7; --margin:#f6b9b9;
   --card:#ffffff; --border:#ebe3d3;
   --yellow:#ffc93c; --red:#ff6b6b; --blue:#4d96ff; --green:#3bb273; --purple:#9b5de5; --orange:#ff9f43; --pink:#ff8fab;
-  --accent:var(--blue); --shadow:0 6px 0 rgba(43,42,51,.10), 0 18px 40px -18px rgba(43,42,51,.25);
+  /* Identidade Marista — ajuste aqui se a coordenação passar os códigos oficiais */
+  --marista:#003C78; --marista-2:#0072CE; --marista-ink:#ffffff; --title:var(--marista);
+  --accent:var(--marista-2); --shadow:0 6px 0 rgba(43,42,51,.10), 0 18px 40px -18px rgba(43,42,51,.25);
   --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
   --ease-bounce:cubic-bezier(.34,1.56,.64,1);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --paper:#1d1c24; --ink:#f3f1ea; --muted:#b2aebd; --line:#262936; --margin:#4a3036;
-    --card:#272631; --border:#3a3846; --shadow:0 6px 0 rgba(0,0,0,.35), 0 18px 40px -18px rgba(0,0,0,.6);
+    --card:#272631; --border:#3a3846; --title:#f3f1ea; --shadow:0 6px 0 rgba(0,0,0,.35), 0 18px 40px -18px rgba(0,0,0,.6);
   }
 }
 :root[data-theme="dark"]{
   --paper:#1d1c24; --ink:#f3f1ea; --muted:#b2aebd; --line:#262936; --margin:#4a3036;
-  --card:#272631; --border:#3a3846; --shadow:0 6px 0 rgba(0,0,0,.35), 0 18px 40px -18px rgba(0,0,0,.6);
+  --card:#272631; --border:#3a3846; --title:#f3f1ea; --shadow:0 6px 0 rgba(0,0,0,.35), 0 18px 40px -18px rgba(0,0,0,.6);
 }
 
 /* ============ BASE (mobile first) ============ */
@@ -39,11 +41,14 @@ body{
   min-height:100dvh; line-height:1.5; overflow-x:hidden;
 }
 h1,h2,h3,.fred{font-family:Fredoka,Nunito,sans-serif; line-height:1.15}
-.wrap{position:relative; z-index:1; max-width:760px; margin:0 auto; padding:calc(14px + var(--safe-t)) 16px calc(28px + var(--safe-b)); min-height:100dvh; display:flex; flex-direction:column}
+.wrap{position:relative; z-index:1; max-width:760px; margin:0 auto; padding:14px 16px calc(28px + var(--safe-b)); min-height:100dvh; display:flex; flex-direction:column}
 .card{background:var(--card); border:2px solid var(--border); border-radius:24px; padding:22px 18px; box-shadow:var(--shadow)}
 .hidden{display:none !important}
 .center{text-align:center}
-.brand{display:flex; align-items:center; gap:8px; justify-content:center; margin:2px 0 14px; color:var(--muted); font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:.72rem}
+.brand{display:flex; align-items:center; gap:10px; justify-content:center; margin:-14px -16px 16px; padding:calc(10px + var(--safe-t)) 16px 10px; background:var(--marista); color:var(--marista-ink); font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:.72rem; border-bottom:4px solid var(--marista-2)}
+.brand img{height:34px; width:auto; display:block}
+.brand .sep-v{width:1px; align-self:stretch; background:rgba(255,255,255,.35)}
+.print-logo{height:40px; width:auto; float:right}
 .brand .pen{display:inline-block; animation:write 2.4s ease-in-out infinite}
 @keyframes write{0%,100%{transform:rotate(0) translateX(0)}25%{transform:rotate(-12deg) translateX(-2px)}50%{transform:rotate(6deg) translateX(2px)}75%{transform:rotate(-6deg)}}
 
@@ -78,9 +83,9 @@ label.lbl{display:block; font-weight:800; margin:18px 0 8px}
 
 /* ============ START ============ */
 .hero{padding-top:6px}
-.hero h1{font-size:clamp(2rem,9vw,2.8rem); margin:0; letter-spacing:-.01em}
+.hero h1{font-size:clamp(2rem,9vw,2.8rem); margin:0; letter-spacing:-.01em; color:var(--title)}
 .hero h1 .word{display:inline-block; animation:dropIn .7s var(--ease-bounce) both}
-.hero h1 .word:nth-child(2){animation-delay:.12s; color:var(--accent)}
+.hero h1 .word:nth-child(2){animation-delay:.12s; color:var(--marista-2)}
 .hero h1 .word:nth-child(3){animation-delay:.24s}
 @keyframes dropIn{from{opacity:0; transform:translateY(-30px) rotate(-6deg)}to{opacity:1; transform:none}}
 .underline{display:block; margin:4px auto 0; width:min(240px,70%); height:14px}
@@ -223,7 +228,7 @@ label.lbl{display:block; font-weight:800; margin:18px 0 8px}
 .final-msg p{margin:0 0 12px}
 .final-msg .rv{opacity:0; transform:translateY(16px); transition:opacity .6s, transform .6s var(--ease-bounce)}
 .final-msg .rv.in{opacity:1; transform:none}
-.ticket{position:relative; margin:18px 0; border-radius:20px; background:var(--accent); color:#fff; padding:18px; overflow:hidden; box-shadow:0 6px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.ticket{position:relative; margin:18px 0; border-radius:20px; background:var(--marista); color:#fff; padding:18px; overflow:hidden; box-shadow:0 6px 0 var(--marista-2)}
 .ticket::before,.ticket::after{content:""; position:absolute; top:50%; width:24px; height:24px; margin-top:-12px; border-radius:50%; background:var(--card)}
 .ticket::before{left:-12px} .ticket::after{right:-12px}
 .ticket .t-title{font-family:Fredoka; font-weight:700; letter-spacing:.1em; font-size:.8rem; opacity:.85; margin:0 0 10px}
@@ -252,6 +257,7 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
 @media (min-width:640px){
   body{background-image:linear-gradient(90deg,transparent 46px,var(--margin) 46px,var(--margin) 48px,transparent 48px),repeating-linear-gradient(var(--paper) 0 31px,var(--line) 31px 32px)}
   .wrap{padding-top:28px}
+  .brand{margin:-14px 0 20px; border-radius:0 0 18px 18px}
   .card{padding:30px}
   .qtext{font-size:1.45rem}
   .opt:hover{transform:translateX(5px); border-color:var(--c)}
@@ -294,7 +300,7 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
 <div class="toast no-print" id="toast" role="status" aria-live="polite"><div class="medal" id="toast-medal">🏅</div><div><small>Conquista desbloqueada</small><b id="toast-text"></b></div></div>
 
 <div class="wrap">
-  <div class="brand no-print"><span class="pen">✏️</span> Feedback Integral · Autoavaliação</div>
+  <header class="brand no-print"><img src="logo-marista.png" alt="Colégio Marista" onerror="this.nextElementSibling.remove();this.remove()"><span class="sep-v"></span><span><span class="pen">✏️</span> Integral · Autoavaliação</span></header>
 
   <!-- START -->
   <section id="screen-start" class="card">
@@ -322,6 +328,7 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
 
   <!-- BLANK PRINT VERSION -->
   <section id="screen-blank" class="blank-only">
+    <img class="print-logo" src="logo-marista.png" alt="" onerror="this.remove()">
     <h2 style="margin:0">Estojo de Talentos — Autoavaliação</h2>
     <p>Nome: ____________________________________________ &nbsp; Data: ____/____/______</p>
     <ol id="blank-q"></ol>
@@ -362,7 +369,7 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
   <section id="screen-result" class="hidden">
     <div class="card">
       <div class="print-only">
-        <h2 style="margin:0">Estojo de Talentos — Autoavaliação</h2>
+        <img class="print-logo" src="logo-marista.png" alt="" onerror="this.remove()"><h2 style="margin:0">Estojo de Talentos — Autoavaliação</h2>
         <p style="margin:4px 0 14px">Professor(a): <b class="r-name"></b> · <span class="r-email"></span> · Respondido em <span id="r-when"></span></p>
       </div>
       <div class="center">
