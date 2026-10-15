@@ -105,6 +105,8 @@ label.lbl{display:block; font-weight:800; margin:18px 0 8px}
 .how b{display:block; font-size:1.3rem}
 @keyframes rise{from{opacity:0; transform:translateY(14px)}to{opacity:1; transform:none}}
 .start-actions{margin-top:14px; display:grid; gap:10px}
+.link-btn{justify-self:center; background:none; border:0; padding:8px; font:600 .8rem Nunito,sans-serif; color:var(--muted); opacity:.7; text-decoration:underline; text-underline-offset:3px; cursor:pointer}
+.link-btn:hover{opacity:1}
 
 /* ============ QUIZ ============ */
 #screen-quiz{flex:1; display:flex; flex-direction:column}
@@ -251,6 +253,19 @@ details summary::after{content:"▾"; margin-left:auto; transition:transform .3s
 details[open] summary::after{transform:rotate(180deg)}
 .actions{display:grid; gap:10px; margin-top:18px}
 
+/* Easter egg */
+.egg{position:fixed; inset:0; z-index:70; display:grid; place-items:center; padding:24px; background:rgba(0,30,60,.55); backdrop-filter:blur(3px); animation:fadeIn .25s}
+.egg[hidden]{display:none}
+@keyframes fadeIn{from{opacity:0}}
+.egg-card{background:var(--card); border-radius:26px; padding:26px 22px; max-width:340px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.35); border-top:8px solid var(--marista-2); animation:eggIn .6s var(--ease-bounce)}
+@keyframes eggIn{from{transform:scale(.3) rotate(-12deg); opacity:0}}
+.egg-emoji{font-size:3.4rem; animation:wobble 1s ease-in-out infinite}
+@keyframes wobble{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+.egg-kicker{margin:6px 0 0; font-weight:800; font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; color:var(--marista-2)}
+.egg-msg{font-family:Fredoka; font-size:1.25rem; margin:8px 0 18px; line-height:1.3}
+.rain{position:fixed; inset:0; z-index:65; pointer-events:none; overflow:hidden}
+.rain span{position:absolute; top:-60px; font-size:var(--s); animation:fall var(--d) cubic-bezier(.4,.1,.6,1) forwards; animation-delay:var(--dl)}
+@keyframes fall{to{transform:translateY(calc(100vh + 120px)) rotate(var(--r))}}
 canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:60}
 .print-only,.blank-only{display:none}
 .blank-opts{display:flex; flex-wrap:wrap; gap:4px 18px; font-size:10pt}
@@ -303,6 +318,10 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
 <body>
 <div class="doodles no-print" id="doodles" aria-hidden="true"></div>
 <canvas id="confetti" aria-hidden="true"></canvas>
+<div class="egg no-print" id="egg" role="dialog" aria-modal="true" aria-labelledby="egg-msg" hidden>
+  <div class="egg-card"><div class="egg-emoji" id="egg-emoji">✏️</div><p class="egg-kicker">Você balançou o estojo!</p><p class="egg-msg" id="egg-msg"></p><button class="btn" id="egg-close" type="button">Fechar</button></div>
+</div>
+<div class="rain no-print" id="rain" aria-hidden="true"></div>
 <div class="toast no-print" id="toast" role="status" aria-live="polite"><div class="medal" id="toast-medal">🏅</div><div><small>Conquista desbloqueada</small><b id="toast-text"></b></div></div>
 
 <div class="wrap">
@@ -327,7 +346,7 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
       <div class="err" id="err" role="alert"></div>
       <div class="start-actions">
         <button class="btn block pulse" type="submit"><span class="shine"></span>Começar a jornada →</button>
-        <button class="btn ghost block" id="btn-blank" type="button">🖨️ Imprimir versão em branco</button>
+        <button class="link-btn" id="btn-blank" type="button">imprimir versão em branco</button>
       </div>
     </form>
   </section>
@@ -422,96 +441,8 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
   </section>
 </div>
 
+<script src="dados.js"></script>
 <script>
-const TEACHERS = [
-  ["TESTE","teste@maristabrasil.org","data de teste","horário de teste"],
-  ["LÍDIA CAROLINE","lidia.costa@maristabrasil.org","3 de novembro, 3ª feira","10h"],
-  ["THAYARA BATISTA","thayara.ribeiro@maristabrasil.org","3 de novembro, 3ª feira","9h"],
-  ["GIZÉLIA DA MOTA","gizelia.rodrigues@maristabrasil.org","3 de novembro, 3ª feira","11h"],
-  ["BRUNA DE BRITO","bruna.brito@maristabrasil.org","6 de novembro, 6ª feira","15h30"],
-  ["CAMILA CARNEIRO","camila.fernandes@maristabrasil.org","5 de novembro, 5ª feira","14h20"],
-  ["TATIANE APARECIDA","tatiane.duarte@maristabrasil.org","5 de novembro, 5ª feira","16h30"],
-  ["VENINA DIVINO","venina.rocha@maristabrasil.org","3 de novembro, 3ª feira","14h20"],
-  ["SELMA MALSCHIK","selma.malschik@maristabrasil.org","5 de novembro, 5ª feira","13h30"],
-  ["DANIELA OLIVEIRA","daniela.barbosa@maristabrasil.org","5 de novembro, 5ª feira","15h10"],
-  ["JAQUELINE DE CASTRO","jaqueline.miranda@maristabrasil.org","3 de novembro, 3ª feira","16h30"],
-  ["ISIS FREITAS","isis.freitas@maristabrasil.org","3 de novembro, 3ª feira","15h10"],
-  ["ÉRICA FERREIRA","erica.bezerra@maristabrasil.org","10 de novembro, 3ª feira","17h30"],
-  ["HELEN LINHARES","helen.linhares@maristabrasil.org","6 de novembro, 6ª feira","11h20"],
-  ["GIOVANNA MELO","giovanna.mendes@maristabrasil.org","6 de novembro, 6ª feira","13h40"],
-  ["EDUARDA ANTUNES","eduarda.souza@maristabrasil.org","5 de novembro, 5ª feira","10h30"],
-  ["YARA ALBINO","yara.silva@maristabrasil.org","5 de novembro, 5ª feira","11h20"],
-  ["ANA PATRÍCIA DA SILVA","ana.veras@maristabrasil.org","6 de novembro, 6ª feira","10h30"],
-  ["ANDREA CARLA","andrea.sampaio@maristabrasil.org","17 de novembro, 3ª feira","15h30"],
-  ["LUCAS","lucas.azevedo@maristabrasil.org","18 de novembro, 4ª feira","15h10"],
-  ["JULIANA DE AZEVEDO","juliana.borges@maristabrasil.org","17 de novembro, 3ª feira","15h"],
-  ["LYARA KELLY","lyara.magno@maristabrasil.org","12 de novembro, 5ª feira","11h10"],
-  ["LORENA MEDEIROS","lorena.medeiros@maristabrasil.org","4 de novembro, 4ª feira","10h"],
-  ["CÁSSIA DE OLIVEIRA","cassia.marra@maristabrasil.org","4 de novembro, 4ª feira","14h"],
-  ["DANIELA BASTOS","bastos.daniela@maristabrasil.org","12 de novembro, 5ª feira","16h30"],
-  ["AMANDA MACHADO","amanda.tavares@maristabrasil.org","11 de novembro, 4ª feira","16h30"],
-  ["ADRIANA BARUFFI","baruffi.adriana@maristabrasil.org","10 de novembro, 3ª feira","16h30"],
-  ["MICHELY CRISTINE","michely.santos@maristabrasil.org","11 de novembro, 4ª feira","13h30"],
-  ["ANE KAROLINE","ane.pereira@maristabrasil.org","4 de novembro, 4ª feira","15h10"],
-  ["LUCIANNA BARBOSA","lucianna.barbosa@maristabrasil.org","4 de novembro, 4ª feira","16h30"],
-  ["SUZANA CASTELO BRANCO","suzana.santana@maristabrasil.org","11 de novembro, 4ª feira","17h20"],
-  ["NARAYANA DOS SANTOS","narayana.andrade@maristabrasil.org","10 de novembro, 3ª feira","11h20"],
-  ["MARTA INACIO","marta.alves@maristabrasil.org","4 de novembro, 4ª feira","11h"],
-  ["MARIA TELMA MENESES","maria.telma@maristabrasil.org","10 de novembro, 3ª feira","15h10"],
-  ["SABRINA DE SOUZA","sabrina.pessoa@maristabrasil.org","13 de novembro, 6ª feira","15h"],
-  ["FERNANDA PANTUZZO","fernanda.pantuzzo@maristabrasil.org","11 de novembro, 4ª feira","15h10"],
-  ["GUILHERME AUGUSTO","guilherme.borges@maristabrasil.org","13 de novembro, 6ª feira","17h"],
-  ["ARTHUR WILSON","arthur.silva@maristabrasil.org","13 de novembro, 6ª feira","16h"],
-  ["BRUNA ARGENTA","bruna.mesquita@maristabrasil.org","12 de novembro, 5ª feira","15h10"],
-  ["RENATA DINIZ","renata.ramos@maristabrasil.org","16 de novembro, 2ª feira","9h"],
-  ["NATÁLIA DE SOUSA","natalia.nascimento@maristabrasil.org","16 de novembro, 2ª feira","10h30"],
-].map(([name,email,date,time]) => ({name,email,date,time}));
-
-const QUESTIONS = [
-  "Quando surge um desafio inesperado em minha rotina, busco soluções com iniciativa.",
-  "Participo ativamente das propostas e projetos da equipe.",
-  "Compartilho ideias que contribuem para melhorar o trabalho realizado.",
-  "Procuro manter meus planejamentos, registros e materiais organizados.",
-  "Estou aberto(a) a feedbacks e utilizo-os para meu crescimento profissional.",
-  "Colaboro com meus colegas quando percebo que precisam de ajuda.",
-  "Busco construir relações respeitosas e acolhedoras com alunos, famílias e equipe.",
-  "Consigo adaptar minhas propostas quando algo não acontece como planejado.",
-  "Apresento novas ideias ou estratégias para enriquecer as experiências das crianças.",
-  "Assumo responsabilidade pelos combinados e compromissos da equipe.",
-  "Procuro enxergar o potencial de cada aluno e valorizar seus avanços.",
-  "Mantenho uma comunicação clara e respeitosa mesmo em situações desafiadoras.",
-  "Tenho iniciativa para aprender coisas novas e aperfeiçoar minha prática.",
-  "Contribuo para um ambiente de trabalho positivo e colaborativo.",
-  "Persevero diante das dificuldades sem perder o foco nos objetivos.",
-];
-
-const OPTIONS = [
-  {label:"Sempre", pts:4, color:"var(--green)", hex:"#3bb273"},
-  {label:"Frequentemente", pts:3, color:"var(--blue)", hex:"#4d96ff"},
-  {label:"Às vezes", pts:2, color:"var(--orange)", hex:"#ff9f43"},
-  {label:"Raramente", pts:1, color:"var(--purple)", hex:"#9b5de5"},
-];
-
-// Material icons (simple inline SVG drawings)
-const ICONS = {
-  borracha:`<svg viewBox="0 0 64 64"><g transform="rotate(-20 32 32)"><rect x="10" y="22" width="44" height="20" rx="5" fill="#ff8fab"/><rect x="34" y="22" width="20" height="20" rx="5" fill="#4d96ff"/><rect x="34" y="22" width="6" height="20" fill="#4d96ff"/></g></svg>`,
-  grampeador:`<svg viewBox="0 0 64 64"><rect x="8" y="42" width="48" height="8" rx="4" fill="#555"/><path d="M10 40 Q10 26 24 26 H52 a4 4 0 0 1 4 4 v6 a4 4 0 0 1 -4 4 Z" fill="#ff6b6b"/><circle cx="14" cy="42" r="4" fill="#333"/></svg>`,
-  lapisdecor:`<svg viewBox="0 0 64 64"><g transform="rotate(-35 32 32)"><rect x="12" y="14" width="10" height="34" fill="#ff6b6b"/><path d="M12 14 L17 4 L22 14Z" fill="#ff6b6b"/><rect x="27" y="14" width="10" height="34" fill="#ffc93c"/><path d="M27 14 L32 4 L37 14Z" fill="#ffc93c"/><rect x="42" y="14" width="10" height="34" fill="#3bb273"/><path d="M42 14 L47 4 L52 14Z" fill="#3bb273"/></g></svg>`,
-  lapiseira:`<svg viewBox="0 0 64 64"><g transform="rotate(45 32 32)"><rect x="27" y="6" width="10" height="38" rx="3" fill="#9b5de5"/><rect x="27" y="10" width="10" height="4" fill="#ccc"/><path d="M27 44 h10 l-3 8 h-4z" fill="#bbb"/><rect x="31" y="52" width="2" height="6" fill="#333"/><rect x="36" y="14" width="3" height="16" rx="1" fill="#777"/></g></svg>`,
-  tinta:`<svg viewBox="0 0 64 64"><rect x="10" y="30" width="44" height="24" rx="6" fill="#e8e1d3"/><circle cx="20" cy="38" r="5" fill="#ff6b6b"/><circle cx="32" cy="38" r="5" fill="#ffc93c"/><circle cx="44" cy="38" r="5" fill="#4d96ff"/><circle cx="26" cy="47" r="5" fill="#3bb273"/><circle cx="38" cy="47" r="5" fill="#9b5de5"/><g transform="rotate(30 46 14)"><rect x="43" y="2" width="6" height="22" rx="2" fill="#a0522d"/><path d="M43 24 h6 l-1 8 h-4z" fill="#333"/></g></svg>`,
-};
-
-// Faixas de pontuação definidas pela coordenação.
-// Obs.: com 15 perguntas o máximo é 60 pts; a tabela original vai até 56,
-// então 57–60 também abrem a mensagem da TINTA.
-const RANGES = [
-  {max:24, key:"borracha", name:"BORRACHA", article:"da"},
-  {max:32, key:"grampeador", name:"GRAMPEADOR", article:"do"},
-  {max:40, key:"lapisdecor", name:"LÁPIS DE COR", article:"do"},
-  {max:48, key:"lapiseira", name:"LAPISEIRA", article:"da"},
-  {max:Infinity, key:"tinta", name:"TINTA", article:"da"},
-];
-const materialFor = s => RANGES.find(r => s <= r.max);
 
 const ACHIEVEMENTS = {5:["✏️","Primeiro traço!"], 8:["🎯","Metade do caminho!"], 10:["🎒","Estojo quase cheio!"], 14:["🏁","Só falta uma!"]};
 const CHEERS = ["Mandou bem! ✨","Que reflexão bonita! 💛","Seguindo firme! 🚀","Continue assim! 🌈","Isso aí! 🙌","Arrasou! 💫"];
@@ -548,8 +479,21 @@ $("login").addEventListener("submit", e => {
   $("err").textContent = "";
   $("email").blur();
   state = load(email) || {email, answers:Array(QUESTIONS.length).fill(null), i:0, done:false};
+  if(state.done && !state.synced) sync();
   state.done ? showResult(false) : showQuiz();
 });
+
+// Envia o resultado para o painel da coordenação (tenta de novo se a internet falhar)
+async function sync(tries = 0){
+  const st = state;
+  try{
+    await rpc("feedback_integral_enviar", {p_email:st.email, p_nome:TEACHERS.find(t => t.email === st.email).name, p_respostas:st.answers});
+    st.synced = true; if(st === state) save(); else try{ localStorage.setItem(STORE+st.email, JSON.stringify(st)); }catch(e){}
+  }catch(e){
+    if(tries < 5) setTimeout(() => sync(tries + 1), 2000 * 2 ** tries);
+  }
+}
+addEventListener("online", () => { if(state && state.done && !state.synced) sync(); });
 
 function show(id){
   ["screen-start","screen-quiz","screen-loading","screen-result"].forEach(s => $(s).classList.toggle("hidden", s !== id));
@@ -656,7 +600,8 @@ function toast(medal, text){
 
 function finish(){
   if(state.answers.some(a => a == null)){ state.i = state.answers.findIndex(a => a == null); save(); renderQ("prev"); return; }
-  state.done = true; state.when = new Date().toISOString(); save();
+  state.done = true; state.when = new Date().toISOString(); state.synced = false; save();
+  sync();
   show("screen-loading");
   setTimeout(() => showResult(true), reduced ? 300 : 2200);
 }
@@ -734,6 +679,61 @@ $("btn-print").onclick = () => window.print();
 // Versão em branco (papel)
 $("blank-q").innerHTML = QUESTIONS.map((q,i) => `<li><p>${q}</p><div class="blank-opts">${OPTIONS.map(o => `<span>○ ${o.label} (${o.pts} ${o.pts>1?"pontos":"ponto"})</span>`).join("")}</div></li>`).join("");
 $("btn-blank").onclick = () => { document.body.classList.add("blank-mode"); window.print(); };
+
+// ===== Easter egg: balance o celular =====
+const EGG_MSGS = [
+  ["✏️","Professor bom é como lápis: deixa marca e nunca perde a ponta!"],
+  ["🌱","Toda semente plantada em sala de aula floresce no tempo certo."],
+  ["📎","Você é o clipe que mantém a equipe unida!"],
+  ["🎨","Sua aula colore o dia de muitas crianças."],
+  ["⭐","\"Para bem educar as crianças, é preciso amá-las.\" — São Marcelino Champagnat"],
+  ["🧡","Obrigado por tudo que você faz, mesmo quando ninguém está vendo."],
+  ["📏","Não existe régua que meça o carinho de um bom professor."],
+  ["🚀","Hoje é um ótimo dia para ensinar e aprender algo novo!"],
+];
+let eggOpen = false, lastEgg = 0, eggIdx = Math.random() * EGG_MSGS.length | 0;
+function easterEgg(){
+  const now = Date.now();
+  if(eggOpen || now - lastEgg < 2500) return;
+  lastEgg = now; eggOpen = true;
+  const [emoji, msg] = EGG_MSGS[eggIdx++ % EGG_MSGS.length];
+  $("egg-emoji").textContent = emoji; $("egg-msg").textContent = msg;
+  $("egg").hidden = false; buzz([60,40,60,40,120]);
+  if(!reduced){
+    const items = ["✏️","🖍️","📎","✂️","📏","🎨","📐","⭐","📒","🧽"];
+    $("rain").innerHTML = Array.from({length:36}, () =>
+      `<span style="left:${Math.random()*100}%;--s:${22+Math.random()*22}px;--d:${1.8+Math.random()*1.6}s;--dl:${Math.random()*.8}s;--r:${(Math.random()*720-360)|0}deg">${items[Math.random()*items.length|0]}</span>`).join("");
+    setTimeout(() => $("rain").innerHTML = "", 4000);
+  }
+  $("egg-close").focus();
+}
+$("egg-close").onclick = () => { $("egg").hidden = true; eggOpen = false; };
+$("egg").onclick = e => { if(e.target === $("egg")) $("egg-close").onclick(); };
+
+// Detecta o chacoalhão: 3 picos fortes de aceleração em menos de 1,2 s
+let shakes = [];
+function onMotion(e){
+  const a = e.accelerationIncludingGravity || e.acceleration; if(!a) return;
+  const g = Math.hypot(a.x || 0, a.y || 0, a.z || 0);
+  if(Math.abs(g - 9.8) > 14){
+    const t = Date.now(); shakes = shakes.filter(x => t - x < 1200); shakes.push(t);
+    if(shakes.length >= 3){ shakes = []; easterEgg(); }
+  }
+}
+let motionOn = false;
+function enableShake(){
+  if(motionOn || !("DeviceMotionEvent" in window)) return;
+  const start = () => { if(!motionOn){ motionOn = true; addEventListener("devicemotion", onMotion); } };
+  // iPhone exige permissão, pedida no primeiro toque
+  if(typeof DeviceMotionEvent.requestPermission === "function"){
+    DeviceMotionEvent.requestPermission().then(r => { if(r === "granted") start(); }).catch(() => {});
+  } else start();
+}
+if(typeof DeviceMotionEvent === "undefined" || typeof DeviceMotionEvent.requestPermission !== "function") enableShake();
+else addEventListener("click", enableShake, {once:true});
+// No computador: digite "marista" para ver o easter egg
+let typed = "";
+addEventListener("keydown", e => { if(e.target.tagName === "INPUT") return; typed = (typed + e.key.toLowerCase()).slice(-7); if(typed === "marista") easterEgg(); if(e.key === "Escape" && eggOpen) $("egg-close").onclick(); });
 
 $("btn-restart").onclick = () => {
   if(!confirm("Tem certeza? Suas respostas serão apagadas e você responderá novamente.")) return;
