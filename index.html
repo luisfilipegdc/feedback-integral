@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estojo de Talentos</title>
+<meta name="description" content="Autoavaliação gamificada das professoras e professores do Integral, com resultado e horário do feedback.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fffaf0; --ink:#2b2a33; --muted:#6b6874; --line:#dfe9f5; --margin:#f2a7a7;
+  --card:#ffffff; --border:#e8e1d3;
+  --yellow:#ffc93c; --red:#ff6b6b; --blue:#4d96ff; --green:#3bb273; --purple:#9b5de5; --orange:#ff9f43;
+  --accent:var(--blue); --shadow:0 6px 0 rgba(43,42,51,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1d1c24; --ink:#f3f1ea; --muted:#b2aebd; --line:#2a2d3a; --margin:#5b3a3f;
+    --card:#272631; --border:#3a3846; --shadow:0 6px 0 rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1d1c24; --ink:#f3f1ea; --muted:#b2aebd; --line:#2a2d3a; --margin:#5b3a3f;
+  --card:#272631; --border:#3a3846; --shadow:0 6px 0 rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:Nunito,system-ui,sans-serif; color:var(--ink); background:var(--paper);
+  background-image:linear-gradient(90deg,transparent 46px,var(--margin) 46px,var(--margin) 48px,transparent 48px),
+                   repeating-linear-gradient(var(--paper) 0 31px,var(--line) 31px 32px);
+  min-height:100vh; line-height:1.5;
+}
+h1,h2,h3,.fred{font-family:Fredoka,Nunito,sans-serif; line-height:1.15}
+.wrap{max-width:760px; margin:0 auto; padding:24px 16px 64px}
+.card{background:var(--card); border:2px solid var(--border); border-radius:22px; padding:28px; box-shadow:var(--shadow)}
+.hidden{display:none !important}
+.brand{display:flex; align-items:center; gap:10px; justify-content:center; margin:8px 0 22px; color:var(--muted); font-weight:800; letter-spacing:.08em; text-transform:uppercase; font-size:.8rem}
+.btn{
+  font:700 1rem Nunito,sans-serif; border:0; border-radius:14px; padding:14px 22px; cursor:pointer;
+  background:var(--accent); color:#fff; box-shadow:0 4px 0 rgba(0,0,0,.18); transition:transform .08s, box-shadow .08s;
+}
+.btn:active{transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.btn.ghost{background:transparent; color:var(--ink); border:2px solid var(--border); box-shadow:none}
+.btn.big{font-size:1.1rem; padding:16px 28px}
+input[type=email],select{
+  width:100%; font:600 1rem Nunito,sans-serif; padding:14px 16px; border-radius:14px; border:2px solid var(--border);
+  background:var(--paper); color:var(--ink); outline:none;
+}
+input:focus,select:focus{border-color:var(--accent)}
+label.lbl{display:block; font-weight:800; margin:18px 0 8px}
+.err{color:var(--red); font-weight:700; min-height:1.5em; margin-top:8px}
+.center{text-align:center}
+.lead{font-size:1.08rem; color:var(--muted)}
+.supplies{display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin:18px 0 6px}
+.supplies svg{width:54px; height:54px}
+
+/* HUD */
+.hud{display:flex; align-items:center; gap:12px; margin-bottom:16px}
+.hud .pts{font-family:Fredoka; font-weight:700; background:var(--yellow); color:#2b2a33; padding:6px 14px; border-radius:999px; white-space:nowrap}
+.pencil{flex:1; height:22px; position:relative; background:var(--card); border:2px solid var(--border); border-radius:12px 4px 4px 12px; overflow:hidden}
+.pencil .fill{position:absolute; inset:0 auto 0 0; width:0; background:linear-gradient(90deg,var(--yellow),var(--orange)); transition:width .45s cubic-bezier(.3,1.4,.5,1)}
+.pencil .tip{position:absolute; top:0; bottom:0; width:16px; left:0; transition:left .45s cubic-bezier(.3,1.4,.5,1);
+  background:linear-gradient(90deg,#f1d3a6 0 60%,var(--ink) 60%); clip-path:polygon(0 0,100% 50%,0 100%)}
+.counter{font-weight:800; color:var(--muted); font-size:.9rem; white-space:nowrap}
+
+.qnum{display:inline-block; font-family:Fredoka; font-weight:700; background:var(--accent); color:#fff; border-radius:10px; padding:2px 12px; margin-bottom:12px}
+.qtext{font-size:1.35rem; margin:0 0 22px}
+.opts{display:grid; gap:12px}
+.opt{
+  display:flex; align-items:center; gap:14px; width:100%; text-align:left; cursor:pointer;
+  font:700 1.05rem Nunito,sans-serif; color:var(--ink); background:var(--paper);
+  border:2px solid var(--border); border-radius:16px; padding:14px 16px; transition:transform .1s, border-color .1s, background .1s;
+}
+.opt:hover{transform:translateX(4px); border-color:var(--c)}
+.opt .dot{width:34px; height:34px; border-radius:50%; flex:none; display:grid; place-items:center; background:var(--c); color:#fff; font-family:Fredoka}
+.opt .p{margin-left:auto; color:var(--muted); font-weight:700; font-size:.9rem}
+.opt.sel{border-color:var(--c); background:color-mix(in srgb,var(--c) 14%,var(--paper))}
+.nav{display:flex; justify-content:space-between; margin-top:22px; gap:12px}
+.pop{position:fixed; pointer-events:none; font-family:Fredoka; font-weight:700; font-size:1.6rem; color:var(--green); animation:pop .9s ease-out forwards; z-index:20}
+@keyframes pop{from{opacity:1; transform:translateY(0) scale(.8)} to{opacity:0; transform:translateY(-60px) scale(1.2)}}
+.slide{animation:slide .35s ease-out}
+@keyframes slide{from{opacity:0; transform:translateX(30px)} to{opacity:1; transform:none}}
+.badge-msg{min-height:1.6em; text-align:center; font-weight:800; color:var(--purple); margin-top:14px}
+
+/* Result */
+.reveal{perspective:900px; margin:22px auto; width:230px; height:230px; cursor:pointer}
+.flip{position:relative; width:100%; height:100%; transition:transform .9s cubic-bezier(.3,1.3,.5,1); transform-style:preserve-3d}
+.reveal.open .flip{transform:rotateY(180deg)}
+.face{position:absolute; inset:0; backface-visibility:hidden; border-radius:26px; display:grid; place-items:center; text-align:center; padding:16px; border:3px dashed var(--border)}
+.face.front{background:var(--yellow); color:#2b2a33; font-family:Fredoka; font-weight:700; font-size:1.25rem; border-style:solid; border-color:rgba(0,0,0,.1)}
+.face.back{transform:rotateY(180deg); background:var(--card)}
+.face.back svg{width:120px; height:120px}
+.score{font-family:Fredoka; font-size:3.2rem; font-weight:700; margin:0}
+.material-name{font-family:Fredoka; font-size:1.8rem; margin:4px 0 0}
+.final-msg p{margin:0 0 12px}
+.appt{display:grid; grid-template-columns:auto 1fr; gap:8px 14px; background:var(--paper); border:2px dashed var(--accent); border-radius:16px; padding:18px; margin:18px 0}
+.appt b{font-family:Fredoka; letter-spacing:.04em}
+.actions{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:18px}
+.answers{width:100%; border-collapse:collapse; margin-top:10px; font-size:.95rem}
+.answers td{border-top:1px solid var(--border); padding:6px 4px; vertical-align:top}
+.answers td:first-child{width:28px; font-weight:800; color:var(--muted)}
+.answers td:last-child{text-align:right; white-space:nowrap; font-weight:700}
+details summary{cursor:pointer; font-weight:800; margin-top:18px}
+canvas#confetti{position:fixed; inset:0; pointer-events:none; z-index:30}
+.print-only,.blank-only{display:none}
+.blank-opts{display:flex; flex-wrap:wrap; gap:4px 18px; font-size:10pt}
+#blank-q li{margin-bottom:8px; break-inside:avoid} #blank-q p{margin:0 0 2px}
+
+@media (max-width:520px){
+  .card{padding:20px}
+  .qtext{font-size:1.15rem}
+  .opt .p{display:none}
+  body{background-image:repeating-linear-gradient(var(--paper) 0 31px,var(--line) 31px 32px)}
+}
+
+@media print{
+  @page{size:A4; margin:16mm}
+  :root{--paper:#fff; --ink:#000; --muted:#444; --card:#fff; --border:#999}
+  body{background:#fff !important}
+  .no-print,.pop,canvas#confetti,.reveal,#screen-start,#screen-quiz{display:none !important}
+  .print-only{display:block}
+  .wrap{max-width:none; padding:0}
+  .card{box-shadow:none; border:1px solid #999; padding:18px}
+  details{display:block} details>*{display:block}
+  details summary{list-style:none}
+  .answers{font-size:10.5pt}
+  .appt{border-color:#000}
+  body.blank-mode .wrap>*{display:none !important}
+  body.blank-mode #screen-blank{display:block !important; font-size:11pt}
+}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+  <div class="brand no-print">✏️ Feedback Integral · Autoavaliação</div>
+
+  <!-- START -->
+  <section id="screen-start" class="card">
+    <div class="center">
+      <h1 style="font-size:2.2rem;margin:0">Estojo de Talentos</h1>
+      <p class="lead">Uma jornada de reflexão sobre a sua atuação na nossa comunidade escolar. São 15 afirmações — responda com sinceridade e descubra qual material escolar combina com você!</p>
+      <div class="supplies" id="supplies"></div>
+    </div>
+    <form id="login" autocomplete="on">
+      <label class="lbl" for="email">Seu e-mail institucional</label>
+      <input id="email" type="email" placeholder="nome@maristabrasil.org" autocomplete="email" required>
+      <div class="err" id="err" role="alert"></div>
+      <div class="center"><button class="btn big" type="submit">Começar a jornada →</button></div>
+    </form>
+    <p class="center" style="margin:18px 0 0"><button class="btn ghost" id="btn-blank" type="button">🖨️ Imprimir versão em branco (papel)</button></p>
+  </section>
+
+  <!-- BLANK PRINT VERSION -->
+  <section id="screen-blank" class="blank-only">
+    <h2 style="margin:0">Estojo de Talentos — Autoavaliação</h2>
+    <p>Nome: ____________________________________________ &nbsp; Data: ____/____/______</p>
+    <ol id="blank-q"></ol>
+    <p><b>Total de pontos:</b> ________</p>
+    <p style="font-size:10pt"><b>Escala:</b> Sempre = 4 · Frequentemente = 3 · Às vezes = 2 · Raramente = 1<br>
+    <b>Até 24</b> ➡️ BORRACHA · <b>25 a 32</b> ➡️ GRAMPEADOR · <b>33 a 40</b> ➡️ LÁPIS DE COR · <b>41 a 48</b> ➡️ LAPISEIRA · <b>49 ou mais</b> ➡️ TINTA</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="screen-quiz" class="hidden">
+    <div class="hud">
+      <div class="pencil" aria-hidden="true"><div class="fill" id="fill"></div><div class="tip" id="tip"></div></div>
+      <span class="counter" id="counter">1/15</span>
+      <span class="pts" id="pts">0 pts</span>
+    </div>
+    <div class="card" id="qcard"></div>
+    <div class="badge-msg" id="cheer" aria-live="polite"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="screen-result" class="hidden">
+    <div class="card">
+      <div class="print-only">
+        <h2 style="margin:0">Estojo de Talentos — Autoavaliação</h2>
+        <p style="margin:4px 0 14px">Professor(a): <b class="r-name"></b> · <span class="r-email"></span> · Respondido em <span id="r-when"></span></p>
+      </div>
+      <div class="center">
+        <h2 class="no-print" style="margin:0 0 4px">Olá, <span class="r-first"></span>! 🎉</h2>
+        <p class="lead" style="margin:0">Sua pontuação final</p>
+        <p class="score"><span id="r-score">0</span><span style="font-size:1.4rem;color:var(--muted)"> pts</span></p>
+        <div class="reveal no-print" id="reveal" role="button" tabindex="0" aria-label="Toque para revelar seu material">
+          <div class="flip">
+            <div class="face front">🎁<br>Toque para revelar seu material!</div>
+            <div class="face back"><div><div id="r-icon"></div><p class="material-name" id="r-material"></p></div></div>
+          </div>
+        </div>
+        <p class="print-only" style="font-size:1.2rem">Material: <b id="r-material-print"></b></p>
+        <p id="r-instruction" class="fred" style="font-size:1.25rem;margin:6px 0 0;visibility:hidden"></p>
+      </div>
+
+      <hr style="border:0;border-top:2px dashed var(--border);margin:24px 0">
+
+      <div class="final-msg">
+        <h3 style="margin:0 0 10px">Parabéns por concluir esta etapa de reflexão!</h3>
+        <p>Mais do que uma avaliação, este foi um convite para olhar com atenção para sua trajetória, suas escolhas, suas atitudes e a forma como você contribui para a construção da nossa comunidade escolar.</p>
+        <p>Cada resposta revelou características únicas da sua atuação profissional. E, assim como acontece com os materiais escolares, cada pessoa possui talentos, habilidades e formas especiais de deixar sua marca no dia a dia.</p>
+        <p>Agora chegou o momento da descoberta! Dirija-se à sua avaliação individual e encontre a mensagem preparada especialmente para você.</p>
+      </div>
+      <div class="appt">
+        <b>DATA:</b><span id="r-date"></span>
+        <b>HORÁRIO:</b><span id="r-time"></span>
+        <b>LOCAL:</b><span>Sala de artes do prédio do Integral</span>
+      </div>
+
+      <details id="det">
+        <summary>Minhas respostas</summary>
+        <table class="answers" id="r-answers"></table>
+      </details>
+
+      <div class="actions no-print">
+        <button class="btn" id="btn-print">🖨️ Imprimir / salvar PDF</button>
+        <button class="btn ghost" id="btn-restart">Refazer</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const TEACHERS = [
+  ["LÍDIA CAROLINE","lidia.costa@maristabrasil.org","3 de novembro, 3ª feira","10h"],
+  ["THAYARA BATISTA","thayara.ribeiro@maristabrasil.org","3 de novembro, 3ª feira","9h"],
+  ["GIZÉLIA DA MOTA","gizelia.rodrigues@maristabrasil.org","3 de novembro, 3ª feira","11h"],
+  ["BRUNA DE BRITO","bruna.brito@maristabrasil.org","6 de novembro, 6ª feira","15h30"],
+  ["CAMILA CARNEIRO","camila.fernandes@maristabrasil.org","5 de novembro, 5ª feira","14h20"],
+  ["TATIANE APARECIDA","tatiane.duarte@maristabrasil.org","5 de novembro, 5ª feira","16h30"],
+  ["VENINA DIVINO","venina.rocha@maristabrasil.org","3 de novembro, 3ª feira","14h20"],
+  ["SELMA MALSCHIK","selma.malschik@maristabrasil.org","5 de novembro, 5ª feira","13h30"],
+  ["DANIELA OLIVEIRA","daniela.barbosa@maristabrasil.org","5 de novembro, 5ª feira","15h10"],
+  ["JAQUELINE DE CASTRO","jaqueline.miranda@maristabrasil.org","3 de novembro, 3ª feira","16h30"],
+  ["ISIS FREITAS","isis.freitas@maristabrasil.org","3 de novembro, 3ª feira","15h10"],
+  ["ÉRICA FERREIRA","erica.bezerra@maristabrasil.org","10 de novembro, 3ª feira","17h30"],
+  ["HELEN LINHARES","helen.linhares@maristabrasil.org","6 de novembro, 6ª feira","11h20"],
+  ["GIOVANNA MELO","giovanna.mendes@maristabrasil.org","6 de novembro, 6ª feira","13h40"],
+  ["EDUARDA ANTUNES","eduarda.souza@maristabrasil.org","5 de novembro, 5ª feira","10h30"],
+  ["YARA ALBINO","yara.silva@maristabrasil.org","5 de novembro, 5ª feira","11h20"],
+  ["ANA PATRÍCIA DA SILVA","ana.veras@maristabrasil.org","6 de novembro, 6ª feira","10h30"],
+  ["ANDREA CARLA","andrea.sampaio@maristabrasil.org","17 de novembro, 3ª feira","15h30"],
+  ["LUCAS","lucas.azevedo@maristabrasil.org","18 de novembro, 4ª feira","15h10"],
+  ["JULIANA DE AZEVEDO","juliana.borges@maristabrasil.org","17 de novembro, 3ª feira","15h"],
+  ["LYARA KELLY","lyara.magno@maristabrasil.org","12 de novembro, 5ª feira","11h10"],
+  ["LORENA MEDEIROS","lorena.medeiros@maristabrasil.org","4 de novembro, 4ª feira","10h"],
+  ["CÁSSIA DE OLIVEIRA","cassia.marra@maristabrasil.org","4 de novembro, 4ª feira","14h"],
+  ["DANIELA BASTOS","bastos.daniela@maristabrasil.org","12 de novembro, 5ª feira","16h30"],
+  ["AMANDA MACHADO","amanda.tavares@maristabrasil.org","11 de novembro, 4ª feira","16h30"],
+  ["ADRIANA BARUFFI","baruffi.adriana@maristabrasil.org","10 de novembro, 3ª feira","16h30"],
+  ["MICHELY CRISTINE","michely.santos@maristabrasil.org","11 de novembro, 4ª feira","13h30"],
+  ["ANE KAROLINE","ane.pereira@maristabrasil.org","4 de novembro, 4ª feira","15h10"],
+  ["LUCIANNA BARBOSA","lucianna.barbosa@maristabrasil.org","4 de novembro, 4ª feira","16h30"],
+  ["SUZANA CASTELO BRANCO","suzana.santana@maristabrasil.org","11 de novembro, 4ª feira","17h20"],
+  ["NARAYANA DOS SANTOS","narayana.andrade@maristabrasil.org","10 de novembro, 3ª feira","11h20"],
+  ["MARTA INACIO","marta.alves@maristabrasil.org","4 de novembro, 4ª feira","11h"],
+  ["MARIA TELMA MENESES","maria.telma@maristabrasil.org","10 de novembro, 3ª feira","15h10"],
+  ["SABRINA DE SOUZA","sabrina.pessoa@maristabrasil.org","13 de novembro, 6ª feira","15h"],
+  ["FERNANDA PANTUZZO","fernanda.pantuzzo@maristabrasil.org","11 de novembro, 4ª feira","15h10"],
+  ["GUILHERME AUGUSTO","guilherme.borges@maristabrasil.org","13 de novembro, 6ª feira","17h"],
+  ["ARTHUR WILSON","arthur.silva@maristabrasil.org","13 de novembro, 6ª feira","16h"],
+  ["BRUNA ARGENTA","bruna.mesquita@maristabrasil.org","12 de novembro, 5ª feira","15h10"],
+  ["RENATA DINIZ","renata.ramos@maristabrasil.org","16 de novembro, 2ª feira","9h"],
+  ["NATÁLIA DE SOUSA","natalia.nascimento@maristabrasil.org","16 de novembro, 2ª feira","10h30"],
+].map(([name,email,date,time]) => ({name,email,date,time}));
+
+const QUESTIONS = [
+  "Quando surge um desafio inesperado em minha rotina, busco soluções com iniciativa.",
+  "Participo ativamente das propostas e projetos da equipe.",
+  "Compartilho ideias que contribuem para melhorar o trabalho realizado.",
+  "Procuro manter meus planejamentos, registros e materiais organizados.",
+  "Estou aberto(a) a feedbacks e utilizo-os para meu crescimento profissional.",
+  "Colaboro com meus colegas quando percebo que precisam de ajuda.",
+  "Busco construir relações respeitosas e acolhedoras com alunos, famílias e equipe.",
+  "Consigo adaptar minhas propostas quando algo não acontece como planejado.",
+  "Apresento novas ideias ou estratégias para enriquecer as experiências das crianças.",
+  "Assumo responsabilidade pelos combinados e compromissos da equipe.",
+  "Procuro enxergar o potencial de cada aluno e valorizar seus avanços.",
+  "Mantenho uma comunicação clara e respeitosa mesmo em situações desafiadoras.",
+  "Tenho iniciativa para aprender coisas novas e aperfeiçoar minha prática.",
+  "Contribuo para um ambiente de trabalho positivo e colaborativo.",
+  "Persevero diante das dificuldades sem perder o foco nos objetivos.",
+];
+
+const OPTIONS = [
+  {label:"Sempre", pts:4, color:"var(--green)"},
+  {label:"Frequentemente", pts:3, color:"var(--blue)"},
+  {label:"Às vezes", pts:2, color:"var(--orange)"},
+  {label:"Raramente", pts:1, color:"var(--purple)"},
+];
+
+// Material icons (simple inline SVG drawings)
+const ICONS = {
+  borracha:`<svg viewBox="0 0 64 64"><g transform="rotate(-20 32 32)"><rect x="10" y="22" width="44" height="20" rx="5" fill="#ff8fab"/><rect x="34" y="22" width="20" height="20" rx="5" fill="#4d96ff"/><rect x="34" y="22" width="6" height="20" fill="#4d96ff"/></g></svg>`,
+  grampeador:`<svg viewBox="0 0 64 64"><rect x="8" y="42" width="48" height="8" rx="4" fill="#555"/><path d="M10 40 Q10 26 24 26 H52 a4 4 0 0 1 4 4 v6 a4 4 0 0 1 -4 4 Z" fill="#ff6b6b"/><circle cx="14" cy="42" r="4" fill="#333"/></svg>`,
+  lapisdecor:`<svg viewBox="0 0 64 64"><g transform="rotate(-35 32 32)"><rect x="12" y="14" width="10" height="34" fill="#ff6b6b"/><path d="M12 14 L17 4 L22 14Z" fill="#ff6b6b"/><rect x="27" y="14" width="10" height="34" fill="#ffc93c"/><path d="M27 14 L32 4 L37 14Z" fill="#ffc93c"/><rect x="42" y="14" width="10" height="34" fill="#3bb273"/><path d="M42 14 L47 4 L52 14Z" fill="#3bb273"/></g></svg>`,
+  lapiseira:`<svg viewBox="0 0 64 64"><g transform="rotate(45 32 32)"><rect x="27" y="6" width="10" height="38" rx="3" fill="#9b5de5"/><rect x="27" y="10" width="10" height="4" fill="#ccc"/><path d="M27 44 h10 l-3 8 h-4z" fill="#bbb"/><rect x="31" y="52" width="2" height="6" fill="#333"/><rect x="36" y="14" width="3" height="16" rx="1" fill="#777"/></g></svg>`,
+  tinta:`<svg viewBox="0 0 64 64"><rect x="10" y="30" width="44" height="24" rx="6" fill="#e8e1d3"/><circle cx="20" cy="38" r="5" fill="#ff6b6b"/><circle cx="32" cy="38" r="5" fill="#ffc93c"/><circle cx="44" cy="38" r="5" fill="#4d96ff"/><circle cx="26" cy="47" r="5" fill="#3bb273"/><circle cx="38" cy="47" r="5" fill="#9b5de5"/><g transform="rotate(30 46 14)"><rect x="43" y="2" width="6" height="22" rx="2" fill="#a0522d"/><path d="M43 24 h6 l-1 8 h-4z" fill="#333"/></g></svg>`,
+};
+
+// Faixas de pontuação definidas pela coordenação.
+// Obs.: com 15 perguntas o máximo é 60 pts; a tabela original vai até 56,
+// então 57–60 também abrem a mensagem da TINTA.
+const RANGES = [
+  {max:24, key:"borracha", name:"BORRACHA", article:"da"},
+  {max:32, key:"grampeador", name:"GRAMPEADOR", article:"do"},
+  {max:40, key:"lapisdecor", name:"LÁPIS DE COR", article:"do"},
+  {max:48, key:"lapiseira", name:"LAPISEIRA", article:"da"},
+  {max:Infinity, key:"tinta", name:"TINTA", article:"da"},
+];
+const materialFor = s => RANGES.find(r => s <= r.max);
+
+const CHEERS = ["Mandou bem! ✨","Mais um traço no seu estojo! ✏️","Seguindo firme! 🚀","Que reflexão bonita! 💛","Metade do caminho! 🎯","Continue assim! 🌈","Quase lá! 🏁"];
+
+const $ = id => document.getElementById(id);
+const norm = s => s.trim().toLowerCase();
+const STORE = "feedback-integral:";
+let state = null; // {email, answers:[], i, done, when}
+
+function save(){ try{ localStorage.setItem(STORE+state.email, JSON.stringify(state)); }catch(e){} }
+function load(email){ try{ return JSON.parse(localStorage.getItem(STORE+email)); }catch(e){ return null; } }
+const teacher = () => TEACHERS.find(t => t.email === state.email);
+const total = () => state.answers.reduce((a,b) => a + (b||0), 0);
+const titleCase = s => s.toLowerCase().replace(/(^|\s)(\p{L})/gu, (m,a,b) => a + b.toUpperCase()).replace(/\b(Da|De|Do|Dos|Das)\b/g, w => w.toLowerCase());
+
+$("supplies").innerHTML = Object.values(ICONS).join("");
+
+$("login").addEventListener("submit", e => {
+  e.preventDefault();
+  const email = norm($("email").value);
+  const t = TEACHERS.find(t => t.email === email);
+  if(!t){ $("err").textContent = "E-mail não encontrado na lista. Confira se digitou o e-mail institucional corretamente."; return; }
+  $("err").textContent = "";
+  state = load(email) || {email, answers:Array(QUESTIONS.length).fill(null), i:0, done:false};
+  state.done ? showResult(false) : showQuiz();
+});
+
+function show(id){
+  ["screen-start","screen-quiz","screen-result"].forEach(s => $(s).classList.toggle("hidden", s !== id));
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function showQuiz(){ show("screen-quiz"); renderQ(); }
+
+function updateHud(){
+  const answered = state.answers.filter(a => a != null).length;
+  const pct = answered / QUESTIONS.length * 100;
+  $("fill").style.width = pct + "%";
+  $("tip").style.left = `calc(${pct}% - ${pct ? 2 : 0}px)`;
+  $("counter").textContent = `${state.i + 1}/${QUESTIONS.length}`;
+  $("pts").textContent = `${total()} pts`;
+}
+
+function renderQ(){
+  const i = state.i, cur = state.answers[i];
+  $("qcard").className = "card slide";
+  void $("qcard").offsetWidth;
+  $("qcard").innerHTML = `
+    <span class="qnum">Pergunta ${i+1}</span>
+    <h2 class="qtext">${QUESTIONS[i]}</h2>
+    <div class="opts">${OPTIONS.map(o => `
+      <button class="opt ${cur===o.pts?"sel":""}" style="--c:${o.color}" data-pts="${o.pts}">
+        <span class="dot">${o.pts}</span>${o.label}<span class="p">${o.pts} ${o.pts>1?"pontos":"ponto"}</span>
+      </button>`).join("")}
+    </div>
+    <div class="nav">
+      <button class="btn ghost" id="prev" ${i===0?"disabled":""}>← Voltar</button>
+      ${cur!=null ? `<button class="btn" id="next">${i===QUESTIONS.length-1?"Ver resultado 🎁":"Próxima →"}</button>` : ""}
+    </div>`;
+  $("qcard").querySelectorAll(".opt").forEach(b => b.addEventListener("click", ev => choose(+b.dataset.pts, ev)));
+  $("prev").onclick = () => { state.i--; save(); renderQ(); };
+  if($("next")) $("next").onclick = advance;
+  updateHud();
+}
+
+let advancing = false;
+function choose(pts, ev){
+  if(advancing) return;
+  const first = state.answers[state.i] == null;
+  state.answers[state.i] = pts; save();
+  const p = document.createElement("div");
+  p.className = "pop"; p.textContent = `+${pts}`;
+  p.style.left = (ev.clientX || innerWidth/2) + "px"; p.style.top = (ev.clientY || innerHeight/2) + "px";
+  document.body.appendChild(p); setTimeout(() => p.remove(), 900);
+  if(first){
+    const n = state.answers.filter(a => a != null).length;
+    $("cheer").textContent = n === Math.ceil(QUESTIONS.length/2) ? "Metade do caminho! 🎯" : (n % 3 === 0 ? CHEERS[(n/3) % CHEERS.length] : "");
+    advancing = true;
+    $("qcard").querySelectorAll(".opt").forEach(b => b.classList.toggle("sel", +b.dataset.pts === pts));
+    updateHud();
+    setTimeout(() => { advancing = false; advance(); }, 450);
+  } else renderQ();
+}
+
+function advance(){
+  if(state.i < QUESTIONS.length - 1){ state.i++; save(); renderQ(); return; }
+  if(state.answers.some(a => a == null)){ state.i = state.answers.findIndex(a => a == null); save(); renderQ(); return; }
+  state.done = true; state.when = new Date().toISOString(); save();
+  showResult(true);
+}
+
+function showResult(animate){
+  const t = teacher(), s = total(), m = materialFor(s);
+  show("screen-result");
+  document.querySelectorAll(".r-name").forEach(e => e.textContent = t.name);
+  document.querySelectorAll(".r-email").forEach(e => e.textContent = t.email);
+  document.querySelectorAll(".r-first").forEach(e => e.textContent = titleCase(t.name.split(" ")[0]));
+  $("r-when").textContent = state.when ? new Date(state.when).toLocaleString("pt-BR",{dateStyle:"short",timeStyle:"short"}) : "—";
+  $("r-icon").innerHTML = ICONS[m.key];
+  $("r-material").textContent = m.name;
+  $("r-material-print").textContent = m.name;
+  $("r-instruction").textContent = `➡️ Abra a mensagem ${m.article} ${m.name}`;
+  $("r-date").textContent = t.date;
+  $("r-time").textContent = t.time;
+  $("r-answers").innerHTML = QUESTIONS.map((q,i) => {
+    const o = OPTIONS.find(o => o.pts === state.answers[i]);
+    return `<tr><td>${i+1}.</td><td>${q}</td><td>${o.label} (${o.pts})</td></tr>`;
+  }).join("") + `<tr><td></td><td><b>Total</b></td><td>${s} pts</td></tr>`;
+
+  const rv = $("reveal");
+  const open = () => {
+    if(rv.classList.contains("open")) return;
+    rv.classList.add("open");
+    $("r-instruction").style.visibility = "visible";
+    confetti();
+  };
+  rv.onclick = open; rv.onkeydown = e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); open(); } };
+  rv.classList.remove("open");
+  $("r-instruction").style.visibility = "hidden";
+
+  const el = $("r-score");
+  if(animate){
+    let n = 0; const step = () => { if(+el.textContent >= s) return; n = Math.min(s, n + 1); el.textContent = n; if(n < s) setTimeout(step, 1200 / s); };
+    el.textContent = 0;
+    step();
+  } else { el.textContent = s; open(); }
+}
+
+// Garante que as respostas e o material apareçam no papel, mesmo com Ctrl+P
+let detWasOpen = false;
+addEventListener("beforeprint", () => { detWasOpen = $("det").open; $("det").open = true; $("r-instruction").style.visibility = "visible"; if(state && state.done) $("r-score").textContent = total(); });
+addEventListener("afterprint", () => { $("det").open = detWasOpen; document.body.classList.remove("blank-mode"); });
+$("btn-print").onclick = () => window.print();
+
+// Versão em branco (papel)
+$("blank-q").innerHTML = QUESTIONS.map((q,i) => `<li><p>${q}</p><div class="blank-opts">${OPTIONS.map(o => `<span>○ ${o.label} (${o.pts} ${o.pts>1?"pontos":"ponto"})</span>`).join("")}</div></li>`).join("");
+$("btn-blank").onclick = () => { document.body.classList.add("blank-mode"); window.print(); };
+$("btn-restart").onclick = () => {
+  if(!confirm("Tem certeza? Suas respostas serão apagadas e você responderá novamente.")) return;
+  state = {email:state.email, answers:Array(QUESTIONS.length).fill(null), i:0, done:false};
+  save(); showQuiz();
+};
+
+// Confetti
+function confetti(){
+  const c = $("confetti"), ctx = c.getContext("2d");
+  c.width = innerWidth; c.height = innerHeight;
+  const colors = ["#ffc93c","#ff6b6b","#4d96ff","#3bb273","#9b5de5","#ff9f43"];
+  const parts = Array.from({length:160}, () => ({
+    x:Math.random()*c.width, y:-20-Math.random()*c.height*.5, w:6+Math.random()*6, h:10+Math.random()*8,
+    vy:2+Math.random()*3, vx:-1.5+Math.random()*3, r:Math.random()*6, vr:-.2+Math.random()*.4, col:colors[Math.random()*colors.length|0]
+  }));
+  let frames = 0;
+  (function tick(){
+    ctx.clearRect(0,0,c.width,c.height);
+    parts.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.col; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); });
+    if(++frames < 260) requestAnimationFrame(tick); else ctx.clearRect(0,0,c.width,c.height);
+  })();
+}
+</script>
+</body>
+</html>
