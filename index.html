@@ -46,9 +46,12 @@ h1,h2,h3,.fred{font-family:Fredoka,Nunito,sans-serif; line-height:1.15}
 .hidden{display:none !important}
 .center{text-align:center}
 .brand{display:flex; align-items:center; gap:10px; justify-content:center; margin:-14px -16px 16px; padding:calc(10px + var(--safe-t)) 16px 10px; background:var(--marista); color:var(--marista-ink); font-weight:800; letter-spacing:.06em; text-transform:uppercase; font-size:.72rem; border-bottom:4px solid var(--marista-2)}
-.brand img{height:34px; width:auto; display:block}
+.brand{flex-wrap:wrap; row-gap:4px}
+.brand img{height:40px; width:auto; display:block}
+.brand .sep-v{display:none}
+.brand .tag{flex-basis:100%; text-align:center; font-size:.68rem; opacity:.9}
 .brand .sep-v{width:1px; align-self:stretch; background:rgba(255,255,255,.35)}
-.print-logo{height:40px; width:auto; float:right}
+.print-logo{height:40px; width:auto; float:right; filter:brightness(0)}
 .brand .pen{display:inline-block; animation:write 2.4s ease-in-out infinite}
 @keyframes write{0%,100%{transform:rotate(0) translateX(0)}25%{transform:rotate(-12deg) translateX(-2px)}50%{transform:rotate(6deg) translateX(2px)}75%{transform:rotate(-6deg)}}
 
@@ -257,7 +260,10 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
 @media (min-width:640px){
   body{background-image:linear-gradient(90deg,transparent 46px,var(--margin) 46px,var(--margin) 48px,transparent 48px),repeating-linear-gradient(var(--paper) 0 31px,var(--line) 31px 32px)}
   .wrap{padding-top:28px}
-  .brand{margin:-14px 0 20px; border-radius:0 0 18px 18px}
+  .brand{margin:-14px 0 20px; border-radius:0 0 18px 18px; flex-wrap:nowrap; gap:14px}
+  .brand img{height:46px}
+  .brand .sep-v{display:block}
+  .brand .tag{flex-basis:auto; font-size:.75rem}
   .card{padding:30px}
   .qtext{font-size:1.45rem}
   .opt:hover{transform:translateX(5px); border-color:var(--c)}
@@ -300,7 +306,7 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
 <div class="toast no-print" id="toast" role="status" aria-live="polite"><div class="medal" id="toast-medal">🏅</div><div><small>Conquista desbloqueada</small><b id="toast-text"></b></div></div>
 
 <div class="wrap">
-  <header class="brand no-print"><img src="logo-marista.png" alt="Colégio Marista" onerror="this.nextElementSibling.remove();this.remove()"><span class="sep-v"></span><span><span class="pen">✏️</span> Integral · Autoavaliação</span></header>
+  <header class="brand no-print"><img src="logo-marista.png" alt="Colégio Marista" onerror="this.nextElementSibling.remove();this.remove()"><span class="sep-v"></span><span class="tag"><span class="pen">✏️</span> Integral · Autoavaliação</span></header>
 
   <!-- START -->
   <section id="screen-start" class="card">
