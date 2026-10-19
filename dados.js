@@ -63,27 +63,31 @@ const TEACHERS = [
 
 const QUESTIONS = [
   "Quando surge um desafio inesperado em minha rotina, busco soluções com iniciativa.",
-  "Participo ativamente das propostas e projetos da equipe.",
+  "Contribuo ativamente para a qualidade dos processos da escola, realizando meu trabalho com responsabilidade, alinhamento institucional e compromisso com a melhoria contínua das práticas educacionais.",
   "Compartilho ideias que contribuem para melhorar o trabalho realizado.",
   "Procuro manter meus planejamentos, registros e materiais organizados.",
   "Estou aberto(a) a feedbacks e utilizo-os para meu crescimento profissional.",
   "Colaboro com meus colegas quando percebo que precisam de ajuda.",
   "Busco construir relações respeitosas e acolhedoras com alunos, famílias e equipe.",
   "Consigo adaptar minhas propostas quando algo não acontece como planejado.",
-  "Apresento novas ideias ou estratégias para enriquecer as experiências das crianças.",
+  "Promovo e fortaleço os Valores Maristas em minhas ações, relações e decisões, contribuindo para que a cultura institucional seja vivenciada de forma coerente e inspiradora por toda a comunidade escolar.",
   "Assumo responsabilidade pelos combinados e compromissos da equipe.",
   "Procuro enxergar o potencial de cada aluno e valorizar seus avanços.",
-  "Mantenho uma comunicação clara e respeitosa mesmo em situações desafiadoras.",
+  "Contribuo para um ambiente que valoriza o diálogo, a criatividade e a experimentação, buscando aperfeiçoar minha prática e colaborar para a evolução contínua da escola.",
   "Tenho iniciativa para aprender coisas novas e aperfeiçoar minha prática.",
   "Contribuo para um ambiente de trabalho positivo e colaborativo.",
   "Persevero diante das dificuldades sem perder o foco nos objetivos.",
 ];
 
 const OPTIONS = [
-  {label:"Sempre", pts:4, color:"var(--green)", hex:"#3bb273"},
-  {label:"Frequentemente", pts:3, color:"var(--blue)", hex:"#4d96ff"},
-  {label:"Às vezes", pts:2, color:"var(--orange)", hex:"#ff9f43"},
-  {label:"Raramente", pts:1, color:"var(--purple)", hex:"#9b5de5"},
+  {label:"Acima do esperado", pts:4, color:"#3d7fd1", hex:"#3d7fd1",
+   desc:"Superou expectativas com alta qualidade, demonstrando autonomia e contribuindo significativamente para os resultados."},
+  {label:"Dentro do esperado", pts:3, color:"#5f9a3c", hex:"#5f9a3c",
+   desc:"O conhecimento e as habilidades são adequados, garantindo qualidade e consistência na função. O desempenho atende às expectativas."},
+  {label:"Mínimo esperado", pts:2, color:"#d99a16", hex:"#d99a16",
+   desc:"Atendeu parcialmente ao esperado. As entregas foram realizadas, mas com limitações que afetam a consistência e a qualidade do trabalho. Há oportunidades de melhoria."},
+  {label:"Abaixo do esperado", pts:1, color:"#de6450", hex:"#de6450",
+   desc:"O conhecimento e as habilidades ainda não atendem ao necessário, impactando a atuação e a qualidade das entregas. É necessário desenvolvimento para melhorar o desempenho."},
 ];
 
 // Material icons (simple inline SVG drawings)
