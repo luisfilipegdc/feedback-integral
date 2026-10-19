@@ -328,7 +328,7 @@ function renderRows(){
         <span class="meta">
           <span>${res ? `<span class="badge ok">✓ Respondeu</span>` : `<span class="badge wait">⏳ Pendente</span>`}</span>
           <span class="mat">${res ? `${ICONS[k] || ""}${esc(res.material)}` : "—"}</span>
-          <span>📅 ${esc(r.date ? `${r.date.split(",")[0]} · ${r.time}` : "—")}</span>
+          <span>📅 ${esc(r.date ? `${r.date.split(",")[0]} · ${r.time}` : "—")}${r.local ? `<br><small>📍 ${esc(r.local)}</small>` : ""}</span>
         </span>
       </button>
     </div>`;
@@ -370,9 +370,9 @@ document.addEventListener("pointermove", e => {
 
 // CSV (abre no Excel com acentos)
 $("btn-csv").onclick = () => {
-  const head = ["Nome","E-mail","Situação","Pontos","Material","Data do feedback","Horário","Respondido em", ...QUESTIONS.map((_,i) => `P${i+1}`)];
+  const head = ["Nome","E-mail","Situação","Pontos","Material","Data do feedback","Horário","Local","Respondido em", ...QUESTIONS.map((_,i) => `P${i+1}`)];
   const lines = rows.filter(r => !r.test).map(r => [r.name, r.email, r.res ? "Respondeu" : "Pendente", r.res ? r.res.total : "", r.res ? r.res.material : "",
-    r.date, r.time, r.res ? fmtDate(r.res.respondido_em) : "", ...QUESTIONS.map((_,i) => r.res ? r.res.respostas[i] : "")]);
+    r.date, r.time, r.local || "", r.res ? fmtDate(r.res.respondido_em) : "", ...QUESTIONS.map((_,i) => r.res ? r.res.respostas[i] : "")]);
   const csv = [head, ...lines].map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob(["﻿" + csv], {type:"text/csv;charset=utf-8"}));

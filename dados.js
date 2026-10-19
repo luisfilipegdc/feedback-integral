@@ -17,6 +17,18 @@ async function rpc(fn, args){
   return body;
 }
 
+// Local do feedback. As 18 primeiras pessoas do quadro vão para o Ateliê de Luz;
+// as demais, para a sala de artes.
+const LOCAL_PADRAO = "Sala de artes do prédio do Integral";
+const ATELIE_DE_LUZ = [
+  "lidia.costa@maristabrasil.org", "thayara.ribeiro@maristabrasil.org", "gizelia.rodrigues@maristabrasil.org",
+  "bruna.brito@maristabrasil.org", "camila.fernandes@maristabrasil.org", "tatiane.duarte@maristabrasil.org",
+  "venina.rocha@maristabrasil.org", "selma.malschik@maristabrasil.org", "daniela.barbosa@maristabrasil.org",
+  "jaqueline.miranda@maristabrasil.org", "isis.freitas@maristabrasil.org", "erica.bezerra@maristabrasil.org",
+  "helen.linhares@maristabrasil.org", "giovanna.mendes@maristabrasil.org", "eduarda.souza@maristabrasil.org",
+  "yara.silva@maristabrasil.org", "ana.veras@maristabrasil.org", "andrea.sampaio@maristabrasil.org",
+];
+
 const TEACHERS = [
   ["TESTE","teste@maristabrasil.org","data de teste","horário de teste"],
   ["LÍDIA CAROLINE","lidia.costa@maristabrasil.org","3 de novembro, 3ª feira","10h"],
@@ -59,7 +71,7 @@ const TEACHERS = [
   ["BRUNA ARGENTA","bruna.mesquita@maristabrasil.org","12 de novembro, 5ª feira","15h10"],
   ["RENATA DINIZ","renata.ramos@maristabrasil.org","16 de novembro, 2ª feira","9h"],
   ["NATÁLIA DE SOUSA","natalia.nascimento@maristabrasil.org","16 de novembro, 2ª feira","10h30"],
-].map(([name,email,date,time]) => ({name,email,date,time}));
+].map(([name,email,date,time]) => ({name,email,date,time, local:ATELIE_DE_LUZ.includes(email) ? "Ateliê de Luz" : LOCAL_PADRAO}));
 
 const QUESTIONS = [
   "Quando surge um desafio inesperado em minha rotina, busco soluções com iniciativa.",

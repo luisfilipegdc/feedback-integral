@@ -451,7 +451,7 @@ canvas#confetti{position:fixed; inset:0; width:100%; height:100%; pointer-events
           <p class="t-title">🎟️ SEU FEEDBACK</p>
           <div class="row"><div class="ico">📅</div><div><small>DATA</small><span id="r-date"></span></div></div>
           <div class="row"><div class="ico">⏰</div><div><small>HORÁRIO</small><span id="r-time"></span></div></div>
-          <div class="row"><div class="ico">📍</div><div><small>LOCAL</small><span>Sala de artes do prédio do Integral</span></div></div>
+          <div class="row"><div class="ico">📍</div><div><small>LOCAL</small><span id="r-local"></span></div></div>
         </div>
       </div>
 
@@ -660,6 +660,7 @@ function showResult(animate){
   $("r-instruction").textContent = `➡️ Abra a mensagem ${m.article} ${m.name}`;
   $("r-date").textContent = t.date;
   $("r-time").textContent = t.time;
+  $("r-local").textContent = t.local;
   $("r-answers").innerHTML = QUESTIONS.map((q,i) => {
     const o = OPTIONS.find(o => o.pts === state.answers[i]);
     return `<tr><td>${i+1}.</td><td>${q}</td><td>${o.label} (${o.pts})</td></tr>`;
