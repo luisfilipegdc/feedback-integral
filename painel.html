@@ -131,6 +131,38 @@ input:focus{border-color:var(--marista-2); box-shadow:0 0 0 3px color-mix(in srg
 .list-legend{display:none; grid-template-columns:minmax(180px,1.4fr) 110px 150px minmax(170px,1.2fr) 80px; gap:12px; padding:0 15px 6px; font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
 .list-legend span:last-child{text-align:right}
 
+/* Folha individual (mesmo formato da impressão da professora) */
+#sheets{display:none}
+.sheet{font-family:Nunito,system-ui,sans-serif; color:#000; font-size:10pt; line-height:1.35}
+.sheet + .sheet{break-before:page}
+.sheet .s-logo{height:40px; float:right; filter:brightness(0)}
+.sheet h2{font-size:16pt; margin:0}
+.sheet .s-who{margin:4px 0 14px}
+.sheet .s-center{text-align:center; clear:both}
+.sheet .s-lead{margin:0; color:#444}
+.sheet .s-score{font-family:Fredoka,sans-serif; font-size:30pt; font-weight:700; margin:0; line-height:1.1}
+.sheet .s-score small{font-size:14pt; color:#444}
+.sheet .s-mat{font-size:14pt; margin:4px 0}
+.sheet .s-ins{font-family:Fredoka,sans-serif; font-size:14pt; margin:4px 0 0}
+.sheet hr{border:0; border-top:1px dashed #999; margin:10px 0}
+.sheet h3{font-size:13pt; margin:0 0 8px}
+.sheet p{margin:0 0 6px}
+.sheet .s-ticket{border:2px solid #000; border-radius:12px; padding:8px 14px; margin:10px 0; display:flex; flex-wrap:wrap; gap:4px 24px}
+.sheet .s-ticket b{width:auto !important; margin-right:4px}
+.sheet .s-ticket b{display:inline-block; width:90px; font-family:Fredoka,sans-serif}
+.sheet table{width:100%; border-collapse:collapse; font-size:9pt; margin-top:4px}
+.sheet td{border-top:1px solid #bbb; padding:3px 4px; vertical-align:top}
+.sheet td:first-child{width:24px; font-weight:800; color:#444}
+.sheet td:last-child{text-align:right; white-space:nowrap; font-weight:700}
+.detail .d-actions{display:flex; justify-content:flex-end; margin-top:10px}
+
+@media print{
+  @page sheet{size:A4 portrait; margin:12mm 14mm}
+  body.sheets-mode .brand, body.sheets-mode main, body.sheets-mode .tip{display:none !important}
+  body.sheets-mode #sheets{display:block}
+  .sheet{page:sheet}
+}
+
 @media print{
   @page{size:A4 landscape; margin:12mm}
   :root{--paper:#fff; --card:#fff; --ink:#000; --muted:#444; --border:#bbb; --track:#eee; --bar:#0072CE}
@@ -180,7 +212,8 @@ input:focus{border-color:var(--marista-2); box-shadow:0 0 0 3px color-mix(in srg
       <div class="tools">
         <button class="btn ghost" id="btn-refresh">↻ Atualizar</button>
         <button class="btn ghost" id="btn-csv">⬇ Planilha (CSV)</button>
-        <button class="btn ghost" id="btn-print">🖨️ Imprimir</button>
+        <button class="btn ghost" id="btn-print">🖨️ Imprimir painel</button>
+        <button class="btn ghost" id="btn-print-all">🖨️ Imprimir todos os resultados</button>
         <button class="btn ghost" id="btn-logout">Sair</button>
       </div>
     </div>
@@ -222,6 +255,7 @@ input:focus{border-color:var(--marista-2); box-shadow:0 0 0 3px color-mix(in srg
   </section>
 </main>
 <div class="tip hidden" id="tip" role="tooltip"></div>
+<div id="sheets" aria-hidden="true"></div>
 
 <script src="dados.js"></script>
 <script>
@@ -338,6 +372,8 @@ function renderRows(){
 
 // expandir respostas individuais
 $("rows").addEventListener("click", e => {
+  const pb = e.target.closest("button[data-print]");
+  if(pb){ printSheets([rows[+pb.dataset.print]]); return; }
   const b = e.target.closest("button[data-i]"); if(!b || b.disabled) return;
   const row = b.parentElement, open = b.getAttribute("aria-expanded") === "true";
   row.querySelector(".detail")?.remove();
@@ -347,6 +383,7 @@ $("rows").addEventListener("click", e => {
   row.insertAdjacentHTML("beforeend", `<div class="detail">
     <table>${QUESTIONS.map((q,i) => { const o = OPTIONS.find(o => o.pts === r.res.respostas[i]); return `<tr><td>${i+1}.</td><td>${esc(q)}</td><td>${o.label} (${o.pts})</td></tr>`; }).join("")}</table>
     <p class="status" style="text-align:left;margin:8px 0 0">${esc(r.email)} · respondido em ${fmtDate(r.res.respondido_em)}</p>
+    <div class="d-actions"><button class="btn" type="button" data-print="${b.dataset.i}">🖨️ Imprimir resultado</button></div>
   </div>`);
 });
 
@@ -380,6 +417,46 @@ $("btn-csv").onclick = () => {
   a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
 $("btn-print").onclick = () => window.print();
+
+// ===== Folhas individuais de resultado =====
+function sheetHTML(r){
+  const res = r.res, m = RANGES.find(x => x.name === res.material) || {article:"da", name:res.material};
+  const when = new Date(res.respondido_em).toLocaleString("pt-BR", {dateStyle:"short", timeStyle:"short"});
+  return `<section class="sheet">
+    <img class="s-logo" src="logo-marista.png" alt="" onerror="this.remove()">
+    <h2>Estojo de Talentos — Autoavaliação</h2>
+    <p class="s-who">Professor(a): <b>${esc(r.name)}</b> · ${esc(r.email)} · Respondido em ${when}</p>
+    <div class="s-center">
+      <p class="s-lead">Pontuação final</p>
+      <p class="s-score">${res.total}<small> pts</small></p>
+      <p class="s-mat">Material: <b>${esc(m.name)}</b></p>
+      <p class="s-ins">➡️ Abra a mensagem ${m.article} ${esc(m.name)}</p>
+    </div>
+    <hr>
+    <h3>Parabéns por concluir esta etapa de reflexão! 🎉</h3>
+    <p>Mais do que uma avaliação, este foi um convite para olhar com atenção para sua trajetória, suas escolhas, suas atitudes e a forma como você contribui para a construção da nossa comunidade escolar.</p>
+    <p>Cada resposta revelou características únicas da sua atuação profissional. E, assim como acontece com os materiais escolares, cada pessoa possui talentos, habilidades e formas especiais de deixar sua marca no dia a dia.</p>
+    <p>Agora chegou o momento da descoberta! Dirija-se à sua avaliação individual e encontre a mensagem preparada especialmente para você.</p>
+    <div class="s-ticket">
+      <div><b>DATA:</b> ${esc(r.date || "—")}</div>
+      <div><b>HORÁRIO:</b> ${esc(r.time || "—")}</div>
+      <div><b>LOCAL:</b> ${esc(r.local || "—")}</div>
+    </div>
+    <h3>Respostas</h3>
+    <table>${QUESTIONS.map((q,i) => { const o = OPTIONS.find(o => o.pts === res.respostas[i]) || {label:"—", pts:""}; return `<tr><td>${i+1}.</td><td>${esc(q)}</td><td>${o.label} (${o.pts})</td></tr>`; }).join("")}
+      <tr><td></td><td><b>Total</b></td><td>${res.total} pts</td></tr></table>
+  </section>`;
+}
+function printSheets(list){
+  if(!list.length) return alert("Ninguém respondeu ainda.");
+  $("sheets").innerHTML = list.map(sheetHTML).join("");
+  document.body.classList.add("sheets-mode");
+  // espera a logo carregar antes de abrir a impressão
+  const imgs = [...$("sheets").querySelectorAll("img")].filter(i => !i.complete);
+  Promise.all(imgs.map(i => new Promise(ok => { i.onload = i.onerror = ok; }))).then(() => window.print());
+}
+addEventListener("afterprint", () => { document.body.classList.remove("sheets-mode"); $("sheets").innerHTML = ""; });
+$("btn-print-all").onclick = () => printSheets(rows.filter(r => r.res && !r.test));
 
 // mantém o login enquanto a aba estiver aberta
 (async () => {
